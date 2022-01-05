@@ -13,7 +13,7 @@ from discord.ext import commands
 import discord.utils
 import dotenv
 from dotenv import load_dotenv, find_dotenv
-import encryption, load, extraction, edit
+import utils.encryption as encryption, utils.load as load, utils.extraction as extraction, utils.edit as edit
 
 load_dotenv(find_dotenv())
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -123,7 +123,7 @@ async def addPass(ctx, username, password, website):
     reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
 
     if reaction.emoji == "✅" and user == ctx.author:
-        encryption.decFile("masterData.csv")
+        encryption.decFile("utils/masterData.csv")
         refname = str(ctx.author)
         if (load.loadMaster(username, password, website, refname)):
             await conMessage.delete()
@@ -132,7 +132,7 @@ async def addPass(ctx, username, password, website):
             await ctx.send("Error. Please try again later")
     elif reaction.emoji == "❌" and user == ctx.author:
         await ctx.send(embed=embed_conAbort)
-    encryption.encFile("masterData.csv")
+    encryption.encFile("utils/masterData.csv")
 
 
 @client.command(name='get')
@@ -164,7 +164,7 @@ async def deletePass(ctx, username, website):
         color = discord.Color.blue()
     )    
 
-    conMessage = await ctx.send(confirmResult)
+    conMessage = await ctx.send(embed=embed_confirmation)
     await conMessage.add_reaction("✅")
     await conMessage.add_reaction("❌")
 
