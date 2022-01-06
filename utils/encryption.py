@@ -5,16 +5,15 @@ File description:
 Text encyption and decryption functions
 """
 
+import os
+from dotenv import load_dotenv, find_dotenv
 from cryptography.fernet import Fernet
 
+load_dotenv(find_dotenv())
+key = os.getenv('CYPHER_TOKEN')
 
 def encFile(filename):
     '''This function encrypts the file'''
-
-    with open('utils/key.key', 'rb') as filekey:
-        key = filekey.read()
-
-    # using the generated key
     fernet = Fernet(key)
 
     # opening the original file to encrypt
@@ -32,11 +31,6 @@ def encFile(filename):
 
 def decFile(filename):
     '''This function decrypts the file'''
-
-    with open("utils/key.key" , "rb") as keyFile:
-        key = keyFile.read()
-
-    # using the key
     fernet = Fernet(key)
 
     # opening the encrypted file
