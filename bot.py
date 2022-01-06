@@ -11,7 +11,6 @@ import os
 import discord
 from discord.ext import commands
 import discord.utils
-import dotenv
 from dotenv import load_dotenv, find_dotenv
 import utils.encryption as encryption, utils.load as load, utils.extraction as extraction, utils.edit as edit
 
