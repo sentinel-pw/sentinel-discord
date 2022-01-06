@@ -2,9 +2,9 @@
 
 ## Index
 
-- About the bot
-- Installation
-- License
+- [About the bot](#about-the-bot)
+- [Installation](#installation)
+- [License](#license)
 
 ## About the bot
 
