@@ -5,29 +5,42 @@ File description:
 Password print
 """
 
-import csv
+import sqlite3
 from table2ascii import table2ascii as t2a
-import utils.encryption as encryption
+from utils.encryption import decMess
+from utils.connect import connectDB
+
 
 def confirmData(refname, username, website):
-    passList = []   # Innitialising and empty array
+    """
+    This function displays the requested passwords to the user.
+    This function acts as a confirmatory function prior to performing
+    the deletion of the requested password from the database.
+    """
 
-    encryption.decFile("utils/masterData.csv")
+    conn, curr = connectDB()    # Establishing the connection with database
+    passList = []               # Initializing and empty array
 
-    with open ("utils/masterData.csv") as passFile:
-        reader = csv.reader(passFile, delimiter=',')
-        line_count = 0
-        for row in reader:
-            if (line_count != 0):
-                if (row[0]) == refname and row[1] == username and row[3] == website:
-                    element = row
-                    passList.append(element)
-            line_count += 1
-    
-    encryption.encFile("utils/masterData.csv")
+    SQL_SYNTAX_EXTRACT = """
+    SELECT * FROM masterData;
+    """
 
+    try:
+        curr.execute(SQL_SYNTAX_EXTRACT)
+        fetchData = curr.fetchall()
+        conn.commit()
+    except sqlite3.Error as erMessage:
+        print("Command Skipped. Error : ", erMessage)
+
+
+    for i in range(len(fetchData)):
+        if (decMess(fetchData[i][1]) == refname) and (decMess(fetchData[i][2]) == website) and (decMess(fetchData[i][3]) == username):
+            decTuple = (decMess(fetchData[i][3]), decMess(fetchData[i][4]), decMess(fetchData[i][2]))   # Tuple with decrypted data
+            passList.append(decTuple)
+
+    # Discord output
     output = t2a(
-        header = ["User", "Username", "Password", "Website"],
+        header = ["Username", "Password", "Website"],
         body = passList,
         first_col_heading = True,
     )
@@ -42,19 +55,36 @@ def deletePass(refname, username, website):
     credentials.
     """
 
-    encryption.decFile("utils/masterData.csv")
-    
-    lines = []  # Innitialising an empty list
+    conn, curr = connectDB()    # Establishing the connection with database
 
-    with open('utils/masterData.csv', 'r') as readFile:
-        reader = csv.reader(readFile)
-        for row in reader:
-            lines.append(row)
-            if row[0] == refname and row[1] == username and row[3] == website:
-                lines.remove(row)
-    with open('utils/masterData.csv', 'w') as writeFile:
-        writer = csv.writer(writeFile)
-        writer.writerows(lines)
+    # SQL Syntax to extract the data. Will be used to locate the data in table.
+    SQL_SYNTAX_EXTRACT = """
+    SELECT * FROM masterData;
+    """
+
+    # SQL Syntax to delete the data from table.
+    SQL_SYNTAX_DELETE = """
+    DELETE FROM masterData
+    WHERE ID = ?
+    ;
+    """
+
+    try:
+        curr.execute(SQL_SYNTAX_EXTRACT)
+        fetchData = curr.fetchall()
+        conn.commit()
+    except sqlite3.Error as erMessage:
+        print("Command Skipped. Error : ", erMessage)
+
     
-    encryption.encFile("utils/masterData.csv")
-    return True
+    for i in range(len(fetchData)):
+        if (decMess(fetchData[i][1]) == refname) and (decMess(fetchData[i][2]) == website) and (decMess(fetchData[i][3]) == username):
+            flag = i+1
+    
+    try:
+        curr.execute(SQL_SYNTAX_DELETE, (flag,))
+        conn.commit()
+        return True
+    except sqlite3.Error as erMessage:
+        print("Command Skipped. Error : ", erMessage)
+        return False
