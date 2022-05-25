@@ -12,35 +12,18 @@ from cryptography.fernet import Fernet
 load_dotenv(find_dotenv())
 key = os.getenv('CYPHER_TOKEN')
 
-def encFile(filename):
-    '''This function encrypts the file'''
-    fernet = Fernet(key)
 
-    # opening the original file to encrypt
-    with open(filename, 'rb') as file:
-        original = file.read()
-        
-    # encrypting the file
-    encrypted = fernet.encrypt(original)
+def encMess(message):
+    '''Fucntion to encrypt the provided message'''
 
-    # opening the file in write mode and
-    # writing the encrypted data
-    with open(filename, 'wb') as encrypted_file:
-        encrypted_file.write(encrypted)
+    hawkEye =   Fernet(key)                            # Reference
+    resEnc  =   hawkEye.encrypt(message.encode())      # Encryting the encoded message
+    return resEnc
 
 
-def decFile(filename):
-    '''This function decrypts the file'''
-    fernet = Fernet(key)
+def decMess(message):
+    '''Function to decrypt the provided message'''
 
-    # opening the encrypted file
-    with open(filename, 'rb') as enc_file:
-        encrypted = enc_file.read()
-
-    # decrypting the file
-    decrypted = fernet.decrypt(encrypted)
-
-    # opening the file in write mode and
-    # writing the decrypted data
-    with open(filename, 'wb') as dec_file:
-        dec_file.write(decrypted)
+    hawkEye =   Fernet(key)                            # Reference
+    resDec  =   (hawkEye.decrypt(message)).decode()    # Decrypting and decoding the message
+    return resDec
