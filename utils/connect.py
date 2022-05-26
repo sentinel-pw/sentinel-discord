@@ -42,7 +42,6 @@ def connectDB():
     try:
         curr.execute(SQL_CREATE_TABLE_QUERY) 
         conn.commit()
+        return conn, curr
     except sqlite3.Error as erMessage:
         print("Command skipped. Error : ", erMessage)
-
-    return conn, curr
